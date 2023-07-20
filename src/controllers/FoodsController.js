@@ -4,7 +4,7 @@ const AppError = require("../utils/AppError");
 class FoodsController {
   async create(req, res) {
     const { name, description, price, ingredients } = req.body;
-    const { user_id } = req.params;
+    const user_id = req.user.id;
 
     //Categoria é criada a partir de rota própria -> é selecionada no frontend
     const { category } = req.query;
@@ -54,8 +54,9 @@ class FoodsController {
 
   async update(req, res) {
     let { name, description, price, ingredients } = req.body;
-    const { user_id, food_id } = req.params;
-    const { category } = req.query;
+    const { food_id } = req.params;
+    let { category } = req.query;
+    const user_id = req.user.id;
 
     const food = await knex("foods").where("id", food_id).first();
     if(!food) {
