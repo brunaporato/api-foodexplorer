@@ -7,7 +7,7 @@ class CategoriesController {
 
     await knex("categories").insert({name, user_id});
 
-    res.json();
+    return res.json();
   }
 
   async index(req, res) {
