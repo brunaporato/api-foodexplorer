@@ -4,7 +4,9 @@ const categoriesRoutes = Router();
 
 const categoriesController = new CategoriesController();
 
-categoriesRoutes.post("/:user_id", categoriesController.create);
+const ensureAuth = require("../middleware/ensureAuth");
+
+categoriesRoutes.post("/", ensureAuth,categoriesController.create);
 categoriesRoutes.get("/", categoriesController.index);
 
 
