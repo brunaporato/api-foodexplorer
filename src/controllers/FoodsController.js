@@ -1,13 +1,12 @@
 const knex = require("../database/knex");
 const AppError = require("../utils/AppError");
+const DiskStorage = require("../providers/DiskStorage");
 
 class FoodsController {
   async create(req, res) {
-    const { name, description, price, ingredients } = req.body;
+    const { name, description, price, ingredients, category } = req.body;
+    // const file  = req.file.filename;
     const user_id = req.user.id;
-
-    //Categoria é criada a partir de rota própria -> é selecionada no frontend
-    const { category } = req.query;
 
     const checkIfIsAdmin = await knex("users").select("isAdmin").where("id", user_id).first();
 
@@ -15,12 +14,18 @@ class FoodsController {
       throw new AppError("Rota autorizada somente para administradores")
     }
 
+    const diskStorage = new DiskStorage;
+
     const nameInUse = await knex("foods").where("name", name).first();
 
     if(nameInUse) {
       throw new AppError("Um prato com esse nome já está cadastrado")
     }
 
+    // const filename = await diskStorage.saveFile(file);
+
+    
+    
     const [food_id] = await knex("foods").insert({
       name,
       description,
@@ -28,7 +33,7 @@ class FoodsController {
       user_id,
       category
     });
-
+    
     const ingredientsInsert = ingredients.map(ingredient => {
       return {
         food_id,
@@ -37,8 +42,8 @@ class FoodsController {
       }
     });
 
+
     await knex("ingredients").insert(ingredientsInsert);
-    
     //Criar categoria a partir da criação de um prato -> tem que ter um campo para escrever a categoria no front end
     
     // const categoryExists = await knex("categories").select("id").where("name", category).first();
@@ -49,13 +54,12 @@ class FoodsController {
     //   });
     // }
     
-    res.json();
+    res.json(food_id);
   }
 
   async update(req, res) {
-    let { name, description, price, ingredients } = req.body;
+    let { name, description, price, ingredients, category } = req.body;
     const { food_id } = req.params;
-    let { category } = req.query;
     const user_id = req.user.id;
 
     const food = await knex("foods").where("id", food_id).first();
