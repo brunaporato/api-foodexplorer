@@ -93,10 +93,33 @@ class FoodsController {
       await knex("ingredients").where("food_id", food.id).delete();
     }
 
-    await knex("foods").where("id", food_id).update({ name, description, price, category });
+    await knex("foods")
+    .where("id", food_id)
+    .update({
+      name,
+      description,
+      price,
+      category
+    });
+
+    const ingredientsArray = ingredients.map(ingredient => {
+      if(ingredient.name) {
+        return ingredient.name
+      } else {
+        return ingredient
+      }
+    });
     
-    const splitIngredients = ingredients.map(ingredient => ingredient.trim());
-    splitIngredients.forEach(async (ingredient) => await knex("ingredients").insert({ name: ingredient, food_id: food.id, user_id }))
+    
+    ingredientsArray.map(
+      async (ingredient) => 
+      await knex("ingredients")
+      .insert({
+        name: ingredient,
+        food_id: food.id,
+        user_id
+      })
+      )
     
 
     return res.json();
