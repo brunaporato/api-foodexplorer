@@ -4,6 +4,8 @@ const DiskStorage = require("../providers/DiskStorage");
 
 class FoodsController {
   async create(req, res) {
+    const diskStorage = new DiskStorage;
+
     const { name, description, price, ingredients, category } = req.body;
     // const file  = req.file.filename;
     const user_id = req.user.id;
@@ -14,7 +16,6 @@ class FoodsController {
       throw new AppError("Rota autorizada somente para administradores")
     }
 
-    const diskStorage = new DiskStorage;
 
     const nameInUse = await knex("foods").where("name", name).first();
 
@@ -44,15 +45,6 @@ class FoodsController {
 
 
     await knex("ingredients").insert(ingredientsInsert);
-    //Criar categoria a partir da criação de um prato -> tem que ter um campo para escrever a categoria no front end
-    
-    // const categoryExists = await knex("categories").select("id").where("name", category).first();
-    // if(!categoryExists) {
-    //   await knex("categories").insert({
-    //     user_id,
-    //     name: category
-    //   });
-    // }
     
     res.json(food_id);
   }
@@ -127,7 +119,11 @@ class FoodsController {
 
   async delete(req, res) {
     const { food_id } = req.params;
+    const diskStorage = new DiskStorage;
+    const food = await knex("foods").where("id", food_id).first();
 
+
+    await diskStorage.deleteFile(food.image);
     await knex("foods").where("id", food_id).delete();
 
     return res.json();
@@ -167,6 +163,7 @@ class FoodsController {
       .whereLike("foods.name", `%${name}%`)
       .whereIn("ingredients.name", filterIngredients)
       .innerJoin("foods", "foods.id", "ingredients.food_id")
+      .groupBy("foods.id")
       .orderBy("ingredients.name");
     } else {
       foods = await knex("foods")
