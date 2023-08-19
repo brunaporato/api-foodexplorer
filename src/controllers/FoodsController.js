@@ -146,44 +146,39 @@ class FoodsController {
   }
 
   async index(req, res) {
-    const {name, ingredients} = req.query;
-
-    let foods;
-
-    if(ingredients) {
-      const filterIngredients = ingredients.split(",").map(ingredient => ingredient.trim());
-
-      foods = await knex("ingredients")
+    const { search } = req.query;
+  
+    const foods = await knex("foods")
       .select([
         "foods.id",
         "foods.name",
         "foods.price",
-        "foods.description"
+        "foods.description",
+        "foods.category",
+        "foods.image"
       ])
-      .whereLike("foods.name", `%${name}%`)
-      .whereIn("ingredients.name", filterIngredients)
-      .innerJoin("foods", "foods.id", "ingredients.food_id")
+      .leftJoin("ingredients", "foods.id", "ingredients.food_id")
+      .where(function() {
+        this.where("foods.name", "like", `%${search}%`)
+          .orWhere("ingredients.name", "like", `%${search}%`);
+      })
       .groupBy("foods.id")
-      .orderBy("ingredients.name");
-    } else {
-      foods = await knex("foods")
-      .whereLike("name", `%${name}%`)
-      .orderBy("name");
-    }
-
+      .orderBy("foods.name");
+  
     const allIngredients = await knex("ingredients");
-
+    
     const foodWithIngredients = foods.map(food => {
       const foodIngredients = allIngredients.filter(ingredient => ingredient.food_id === food.id);
-
+    
       return {
         ...food,
-        ingredients: foodIngredients
-      }
-    })
-
-    return res.json(foodWithIngredients)
+        ingredients: foodIngredients.map(ingredient => ingredient.name)
+      };
+    });
+    
+    return res.json(foodWithIngredients);
   }
+
 };
 
 module.exports = FoodsController;
