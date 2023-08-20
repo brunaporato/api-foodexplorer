@@ -1,7 +1,5 @@
 # Food Explorer 
 
-![Food Explorer Logo](./src/assets/polygon.svg)
-
 Bem-vindo ao Food Explorer, um projeto que combina a paixão pela comida com a inovação tecnológica. Nossa aplicação backend é um e-commerce voltado para pedidos e vendas de pratos deliciosos. Desenvolvido com Node.js, Express, SQLite, Knex, Multer e Jest, o Food Explorer oferece uma plataforma robusta para gerenciar pratos, processar pedidos e autenticar usuários.
 
 ## Acesso à Aplicação
