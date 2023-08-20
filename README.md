@@ -43,17 +43,12 @@ Para executar a API localmente, siga os passos abaixo:
 ```bash
 npm install
 ```
-4. Adicione a senha criptografada do admin no arquivo .env:
-   
-```bash
-   ADMIN_PASSWORD=$2a$08$eu1sJWVZPuBqBW5dNo2A/.D7lWkOBLRWamkfJjX7I.Kl6WiAZIbva
-```
-5. Execute as migrações para criar as tabelas do banco de dados:
+4. Execute as migrações para criar as tabelas do banco de dados:
 
 ```bash
 npm run migrate
 ```
-6. Inicie o servidor de desenvolvimento:
+5. Inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
